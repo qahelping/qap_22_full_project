@@ -10,7 +10,7 @@ def test_login(driver):
     main_page = MainPage(driver)
     main_page.open()
     main_page.open_tms_app()
-    time.sleep(5)
+
     login_page = LoginPage(driver)
     login_page.login(CHARLI)
 
