@@ -1,8 +1,8 @@
-import dataclasses
 import os
+from dataclasses import dataclass
 
 
-@dataclasses
+@dataclass
 class User:
     email: str
     password: str = os.getenv('BASE_PASSWORD', None)
