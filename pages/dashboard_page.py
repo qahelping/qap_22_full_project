@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 
@@ -13,6 +14,7 @@ class DashboardPage(BasePage):
 
         super().__init__(driver, self.url)
 
+    @allure.step("Assert that dashboard opened")
     def assert_that_dashboard_opened(self):
         self.assert_that_page_opened()
         self.assert_element_visible(self.CREATE_BOARD_BUTTON)

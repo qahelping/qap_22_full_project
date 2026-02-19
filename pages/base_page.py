@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
@@ -14,17 +15,22 @@ class BasePage:
 
         self.wait = WebDriverWait(driver, timeout)
 
-    def open(self):
-        self.driver.get(f"{BaseConfig.ROOT_PATH}{self.url}")
 
+    def open(self):
+        with allure.step(f"Open page: {self.url}"):
+            self.driver.get(f"{BaseConfig.ROOT_PATH}{self.url}")
+
+    @allure.step("Wait for: {locator}")
     def wait_visible(self, locator):
         el = self.wait.until(EC.visibility_of_element_located(locator))
         self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
         return el
 
     def wait_page_opened(self):
-        self.wait.until(EC.url_contains(self.url))
+        with  allure.step(f"Wait for page: {self.url}"):
+            self.wait.until(EC.url_contains(self.url))
 
+    @allure.step("Click on: {locator} with force={is_force}")
     def click(self, locator, is_force=False):
         el = self.wait.until(EC.element_to_be_clickable(locator))
         if is_force:

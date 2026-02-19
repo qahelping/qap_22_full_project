@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 
@@ -29,6 +30,7 @@ class LoginPage(BasePage):
     def open(self):
         self.driver.get(f"{BaseConfig.ROOT_PATH}{self.url}")
 
+    @allure.step("Login with email {user}")
     def login(self, user: User):
         self.send_keys(self.LOGIN_INPUT, user.email)
         self.send_keys(self.PASSWORD_INPUT, user.password)

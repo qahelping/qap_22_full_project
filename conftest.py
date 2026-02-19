@@ -1,11 +1,20 @@
 import time
 
+import allure
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.chrome.webdriver import WebDriver
+
+
+# def generate_path():
+#     os.makedirs("artifacts/screenshots", exist_ok=True)
+#
+#     ts = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+#     name = _safe_name(request.node.nodeid)
+#     return f"artifacts/screenshots/{name}__{ts}.png"
+
 
 def pytest_addoption(parser):
     parser.addoption("--br", action="store", default="chrome", help="the name of the browser")
@@ -59,7 +68,33 @@ def driver(request, pytestconfig):
         web_driver.implicitly_wait(3)
 
     yield web_driver
+
+    report = getattr(request.node, "rep_call", None)
+
+    if report:
+        try:
+            allure.attach(
+                web_driver.get_screenshot_as_png(),
+                name="screenshot",
+                attachment_type=allure.attachment_type.PNG,
+            )
+
+            allure.attach(
+                web_driver.current_url,
+                name="Current url",
+                attachment_type=allure.attachment_type.URI_LIST,
+            )
+        except Exception as e:
+            print(f"Failed to attach: {e}")
+
     web_driver.quit()
+
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    rep = outcome.get_result()
+    setattr(item, "rep_" + rep.when, rep)
 
 
 # @pytest.fixture(autouse=False, params=["chrome"])
@@ -105,6 +140,5 @@ def login(driver):
 
     driver.execute_cdp_cmd("Page.setDownloadBehavior", {"behavior": "deny"})
     assert driver.current_url.endswith("/dashboard")
-
 
 # //*[@id="card-expiry-input"]
