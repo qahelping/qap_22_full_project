@@ -26,10 +26,6 @@ class LoginPage(BasePage):
         super().__init__(driver, self.url)
         self.driver: WebDriver = driver
 
-
-    def open(self):
-        self.driver.get(f"{BaseConfig.ROOT_PATH}{self.url}")
-
     @allure.step("Login with email {user}")
     def login(self, user: User):
         self.send_keys(self.LOGIN_INPUT, user.email)

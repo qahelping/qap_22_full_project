@@ -1,6 +1,7 @@
 import allure
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
 
 from config import BaseConfig
@@ -8,17 +9,17 @@ from config import BaseConfig
 
 class BasePage:
 
-    def __init__(self, driver, url, timeout=BaseConfig.WEB_DRIVER_WAIT, title='Task Management Board'):
+    def __init__(self, driver, url=None, timeout=BaseConfig.WEB_DRIVER_WAIT, title='Task Management Board'):
         self.driver: WebDriver = driver
         self.url = url
         self.title = title
 
         self.wait = WebDriverWait(driver, timeout)
 
-
-    def open(self):
+    def open(self, with_path=None):
         with allure.step(f"Open page: {self.url}"):
-            self.driver.get(f"{BaseConfig.ROOT_PATH}{self.url}")
+            url = f"{BaseConfig.ROOT_PATH}{self.url}{with_path}" if with_path else f"{BaseConfig.ROOT_PATH}{self.url}"
+            self.driver.get(url)
 
     @allure.step("Wait for: {locator}")
     def wait_visible(self, locator):
@@ -44,9 +45,28 @@ class BasePage:
         el = self.wait_visible(locator)
         el.send_keys(value)
 
+    def select_item_by_value(self, locator, value):
+        el = self.wait_visible(locator)
+        select = Select(el)
+        select.select_by_value(value)
+
+    def select_item_by_visible_text(self, locator, visible_text):
+        el = self.wait_visible(locator)
+        select = Select(el)
+        select.select_by_visible_text(visible_text)
+
     def assert_element_visible(self, locator):
         el = self.wait_visible(locator)
         assert el.is_displayed(), f"Element '{locator[-1]}' does not found on the page"
+
+    def assert_text_in_element(self, locator, text):
+        el = self.wait_visible(locator)
+        assert el.text == text, f"Element '{locator[-1]}' does not have text: {text}"
+
+    def assert_text_contain_in_element(self, locator, text):
+        el = self.wait_visible(locator)
+        assert text in el.text, f"Element '{locator[-1]}' does not contain text: {text}"
+
 
     def assert_that_page_opened(self):
         self.wait_page_opened()

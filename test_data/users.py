@@ -9,4 +9,5 @@ class User:
 
 
 CHARLI = User(email='charlie@example.com')
-CHARLI2 = User(email='charlie@example.com', password='password123')
+ADMIN = User(email='admin@example.com', password='admin123')
+
