@@ -1,31 +1,22 @@
-from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.common.by import By
+from playwright.sync_api import Page
 
 from pages.base_page import BasePage
 
 
 class EditTaskModalComponent(BasePage):
-
-    def __init__(self, driver):
-        self.driver: WebDriver = driver
-
+    def __init__(self, page: Page):
         self.component = '[data-qa="edit-task-modal"]'
-        self.COMPONENT = (By.CSS_SELECTOR, f"{self.component}")
-
-        self.CLOSE_BUTTON = (By.CSS_SELECTOR, f'{self.component} [data-qa="modal-close-button"]')
-        self.FORM = (By.CSS_SELECTOR, f'{self.component} [data-qa="edit-task-form"]')
-
-        self.TITLE_INPUT = (By.CSS_SELECTOR, f'{self.component} [data-qa="edit-task-title-input"]')
-        self.DESCRIPTION_TEXTAREA = (By.CSS_SELECTOR, f'{self.component} [data-qa="edit-task-description-textarea"]')
-        self.STATUS_SELECT = (By.CSS_SELECTOR, f'{self.component} [data-qa="edit-task-status-select"]')
-        self.PRIORITY_SELECT = (By.CSS_SELECTOR, f'{self.component} [data-qa="edit-task-priority-select"]')
-        self.ASSIGNEE_SELECT = (By.CSS_SELECTOR, f'{self.component} [data-qa="edit-task-assignee-select"]')
-
-        self.DELETE_BUTTON = (By.CSS_SELECTOR, f'{self.component} [data-qa="edit-task-delete-button"]')
-        self.CANCEL_BUTTON = (By.CSS_SELECTOR, f'{self.component} [data-qa="edit-task-cancel-button"]')
-        self.SAVE_BUTTON = (By.CSS_SELECTOR, f'{self.component} [data-qa="edit-task-save-button"]')
-
-        super().__init__(driver, self.url)
+        self.CLOSE_BUTTON = f'{self.component} [data-qa="modal-close-button"]'
+        self.FORM = f'{self.component} [data-qa="edit-task-form"]'
+        self.TITLE_INPUT = f'{self.component} [data-qa="edit-task-title-input"]'
+        self.DESCRIPTION_TEXTAREA = f'{self.component} [data-qa="edit-task-description-textarea"]'
+        self.STATUS_SELECT = f'{self.component} [data-qa="edit-task-status-select"]'
+        self.PRIORITY_SELECT = f'{self.component} [data-qa="edit-task-priority-select"]'
+        self.ASSIGNEE_SELECT = f'{self.component} [data-qa="edit-task-assignee-select"]'
+        self.DELETE_BUTTON = f'{self.component} [data-qa="edit-task-delete-button"]'
+        self.CANCEL_BUTTON = f'{self.component} [data-qa="edit-task-cancel-button"]'
+        self.SAVE_BUTTON = f'{self.component} [data-qa="edit-task-save-button"]'
+        super().__init__(page, url=None)
 
     def close_modal(self):
         self.click(self.CLOSE_BUTTON)

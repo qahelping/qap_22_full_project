@@ -1,64 +1,57 @@
 import allure
-from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.support.wait import WebDriverWait
+from playwright.sync_api import Locator, Page
 
 
 class BaseElement:
+    def __init__(
+        self,
+        page: Page,
+        selector,
+        timeout=10000,
+    ):
+        self.page: Page = page
+        self.selector = selector
+        self.timeout = timeout
 
-    def __init__(self, driver, selector=None, type_of_locator=By.CSS_SELECTOR, timeout=10):
-        self.driver: WebDriver = driver
-        self.type_of_locator = type_of_locator
-        self.selector: str = selector
-        if self.selector.startswith('//'):
-            self.type_of_locator = By.XPATH
-        else:
-            self.type_of_locator = By.CSS_SELECTOR
+    def _locator(self) -> Locator:
+        return self.page.locator(self.selector)
 
-        self.locator = (self.type_of_locator, self.selector)
-
-        self.wait = WebDriverWait(driver, timeout)
-
-    @allure.step("Wait for: {locator}")
-    def wait_visible(self):
-        el = self.wait.until(EC.visibility_of_element_located(self.locator))
-        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
+    @allure.step("Wait for element: {self._selector_str}")
+    def wait_visible(self) -> Locator:
+        el = self._locator()
+        el.wait_for(state="visible", timeout=self.timeout)
+        el.scroll_into_view_if_needed()
         return el
 
-    @allure.step("Click on: {locator} with force={is_force}")
+    @allure.step("Click on element with force={is_force}")
     def click(self, is_force=False):
-        el = self.wait.until(EC.element_to_be_clickable(self.locator))
+        el = self.wait_visible()
         if is_force:
-            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
-            self.driver.execute_script("arguments[0].click();", el)
-
+            el.scroll_into_view_if_needed()
+            el.dispatch_event("click")
         else:
-            el.click()
+            el.click(timeout=self.timeout)
 
-    def send_keys(self, value):
-        el = self.wait_visible(self.locator)
-        el.send_keys(value)
+    def send_keys(self, value: str):
+        self.wait_visible().fill(value)
 
-    def select_item_by_value(self, value):
-        el = self.wait_visible(self.locator)
-        select = Select(el)
-        select.select_by_value(value)
+    def select_item_by_value(self, value: str):
+        self.wait_visible().select_option(value=value)
 
-    def select_item_by_visible_text(self, visible_text):
-        el = self.wait_visible(self.locator)
-        select = Select(el)
-        select.select_by_visible_text(visible_text)
+    def select_item_by_visible_text(self, visible_text: str):
+        self.wait_visible().select_option(label=visible_text)
 
     def assert_element_visible(self):
-        el = self.wait_visible(self.locator)
-        assert el.is_displayed(), f"Element '{self.locator[-1]}' does not found on the page"
+        el = self.wait_visible()
+        assert el.is_visible(), f"Element '{self.selector}' is not visible on the page"
 
-    def assert_text_in_element(self, text):
-        el = self.wait_visible(self.locator)
-        assert el.text == text, f"Element '{self.locator[-1]}' does not have text: {text}"
+    def assert_text_in_element(self, text: str):
+        el = self.wait_visible()
+        assert el.text_content() == text, (
+            f"Element does not have text: {text}, got: {el.text_content()}"
+        )
 
-    def assert_text_contain_in_element(self, text):
-        el = self.wait_visible(self.locator)
-        assert text in el.text, f"Element '{self.locator[-1]}' does not contain text: {text}"
+    def assert_text_contain_in_element(self, text: str):
+        el = self.wait_visible()
+        content = el.text_content() or ""
+        assert text in content, f"Element does not contain text: {text}"

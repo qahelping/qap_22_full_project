@@ -1,5 +1,6 @@
 import allure
 import pytest
+from playwright.sync_api import Page
 
 from pages.dashboard_page import DashboardPage
 from pages.login_page import LoginPage
@@ -13,18 +14,16 @@ class TestTMS:
     @pytest.mark.auth
     @allure.feature("Auth")
     class TestAuth:
-
         @pytest.mark.smoke
         @allure.title("Login")
-        def test_login(self, driver):
+        def test_login(self, page: Page):
             """Test for login simple user"""
-
-            main_page = MainPage(driver)
+            main_page = MainPage(page)
             main_page.open()
             main_page.open_tms_app()
 
-            login_page = LoginPage(driver)
+            login_page = LoginPage(page)
             login_page.login(CHARLI)
 
-            dashboard_page = DashboardPage(driver)
+            dashboard_page = DashboardPage(page)
             dashboard_page.assert_that_dashboard_opened()
