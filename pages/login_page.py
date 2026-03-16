@@ -32,3 +32,8 @@ class LoginPage(BasePage):
         self.send_keys(self.PASSWORD_INPUT, user.password)
 
         self.click(self.SUBMIT)
+
+    @allure.step("Assert: User logged in")
+    def login_form_is_not_visible(self, user: User):
+        self.wait_invisibility_of_element(self.LOGIN_INPUT)
+        self.wait_invisibility_of_element(self.PASSWORD_INPUT)

@@ -27,6 +27,12 @@ class BasePage:
         self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
         return el
 
+
+    @allure.step("Wait for disappear: {locator}")
+    def wait_invisibility_of_element(self, locator):
+        el = self.wait.until(EC.invisibility_of_element(locator))
+        return el
+
     def wait_page_opened(self):
         with  allure.step(f"Wait for page: {self.url}"):
             self.wait.until(EC.url_contains(self.url))

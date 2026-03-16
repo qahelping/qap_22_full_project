@@ -4,6 +4,8 @@ from selenium.webdriver.common.by import By
 
 from pages.base_page import BasePage
 
+def get_data_qa(loc):
+    pass
 
 class BoardPage(BasePage):
     CREATE_BOARD_BUTTON = (By.CSS_SELECTOR, get_data_qa('dashboard-create-board-button'))
